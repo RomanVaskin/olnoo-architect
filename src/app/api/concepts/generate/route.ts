@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   if (!auth.ok) {
     return NextResponse.json({ error: { code: auth.code, message: auth.message } }, { status: auth.status });
   }
-  if (!process.env.GEMINI_API_KEY) {
+  if (!process.env.AI_ROUTER_URL || !process.env.AI_ROUTER_API_KEY) {
     return errorResponse(new GenerationError("missing-api-key"), 500);
   }
 

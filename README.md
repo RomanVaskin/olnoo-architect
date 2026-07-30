@@ -35,3 +35,19 @@ architect-olnoo/
 ## Development
 
 Проект пока находится в фазе документирования — исходный код и зависимости ещё не добавлены. Дальнейшие шаги по разработке будут описаны здесь по мере появления кода в [`src/`](src/).
+
+## AI architecture
+
+```text
+Architect browser
+      ↓ authenticated Next.js API routes
+Architect generation/review orchestration
+      ↓ AI_ROUTER_URL + x-api-key
+OLNOO AI Router
+      ↓ provider adapter
+Gemini
+```
+
+Architect does not contain a provider SDK or provider credential. See
+[`docs/04-AI-PIPELINE.md`](docs/04-AI-PIPELINE.md) and
+[`docs/11-DEPLOYMENT.md`](docs/11-DEPLOYMENT.md).

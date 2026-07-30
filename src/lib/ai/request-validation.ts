@@ -11,14 +11,14 @@ const SOURCE_VIEW_ROLES = new Set<SourceViewRole>(["front", "side", "rear", "det
 
 /**
  * Conservative cap on the combined raw (pre-base64) bytes of all images in a
- * single generation request. Gemini's documented inline-request limit is
+ * single generation request. The current provider's inline-request limit is
  * ~20MB total for the whole request (prompt + files); base64 encoding
  * inflates raw bytes by ~4/3, and the JSON request wrapper adds a little
  * more. Staying well under 20MB after that expansion leaves headroom for the
  * prompt text and multiple image parts instead of failing right at the edge.
  *
- * TODO: if requests routinely approach this limit, switch to the Gemini
- * Files API (upload once, reference by URI) instead of sending images inline
+ * TODO: if requests routinely approach this limit, add a Router file-upload
+ * contract (upload once, reference by URI) instead of sending images inline
  * — not implemented yet, since MVP request sizes are far below it.
  */
 export const MAX_TOTAL_INLINE_IMAGE_BYTES = 12 * 1024 * 1024;

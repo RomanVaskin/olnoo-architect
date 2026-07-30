@@ -16,7 +16,12 @@
 
 Первый работающий кусок пайплайна — синхронный Route Handler `POST /api/concepts/generate` (не полноценный Agent Orchestrator из [02-PLATFORM-ARCHITECTURE.md](02-PLATFORM-ARCHITECTURE.md), который появится позже). Подробности контракта, модели и обработки ошибок — в [specs/exterior-agent.md](../specs/exterior-agent.md).
 
-Ключевой архитектурный выбор: провайдер и конкретная модель полностью скрыты за провайдер-независимым реестром режимов (`src/lib/ai/model-registry.ts`) и адаптером (`src/lib/ai/gemini-provider.ts`) — ни клиент, ни остальной сервер не знают технических имён моделей, в соответствии с [AI Abstraction](01-PRODUCT.md#ai-abstraction) и [No Vendor Lock-In](01-PRODUCT.md#no-vendor-lock-in). Добавление другого провайдера (OpenAI, FLUX) не требует изменений в API-контракте или UI.
+Ключевой архитектурный выбор: провайдер полностью скрыт за реестром режимов
+(`src/lib/ai/model-registry.ts`) и Router-адаптерами
+(`src/lib/ai/router-provider.ts`, `src/lib/ai/router-geometry-reviewer.ts`).
+Architect отправляет мультимодальные запросы только в OLNOO AI Router. Router
+выбирает провайдера, хранит его ключ, нормализует ошибки и вызывает Gemini; в
+Architect нет SDK или прямого provider-вызова.
 
 ## Содержание (TBD)
 

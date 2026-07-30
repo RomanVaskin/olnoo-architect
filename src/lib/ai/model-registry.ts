@@ -15,19 +15,19 @@ const FAST_MODEL = "gemini-3.1-flash-lite-image";
 const MAXIMUM_QUALITY_MODEL = "gemini-3-pro-image";
 
 function balancedModel(): string {
-  return process.env.GEMINI_IMAGE_MODEL?.trim() || "gemini-3.1-flash-image";
+  return process.env.AI_IMAGE_MODEL?.trim() || "gemini-3.1-flash-image";
 }
 
 /** "auto" currently resolves to Balanced; it is not a distinct model. */
 export function resolveModelSpec(mode: GenerationMode): ModelSpec {
   switch (mode === "auto" ? "balanced" : mode) {
     case "fast":
-      return { provider: "gemini", model: FAST_MODEL };
+      return { provider: "router", model: FAST_MODEL };
     case "maximum-quality":
-      return { provider: "gemini", model: MAXIMUM_QUALITY_MODEL };
+      return { provider: "router", model: MAXIMUM_QUALITY_MODEL };
     case "balanced":
     default:
-      return { provider: "gemini", model: balancedModel() };
+      return { provider: "router", model: balancedModel() };
   }
 }
 

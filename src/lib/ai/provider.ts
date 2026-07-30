@@ -1,15 +1,14 @@
-import { geminiProvider } from "./gemini-provider";
+import { routerProvider } from "./router-provider";
 import type { ImageGenerationProvider, ModelSpec } from "./types";
 
 /**
- * Resolves a ModelSpec to a concrete provider adapter. Adding OpenAI or FLUX
- * later means adding a case here — the API route and everything above it
- * only ever deals with GenerationMode / ModelSpec, never a provider directly.
+ * Resolves the model selected for an Architect workflow to the shared OLNOO
+ * AI Router transport. Architect never calls a model vendor directly.
  */
 export function getProvider(spec: ModelSpec): ImageGenerationProvider {
   switch (spec.provider) {
-    case "gemini":
-      return geminiProvider;
+    case "router":
+      return routerProvider;
     default:
       throw new Error(`Unknown provider: ${spec.provider satisfies never}`);
   }

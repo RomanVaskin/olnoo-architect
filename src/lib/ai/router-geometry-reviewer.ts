@@ -1,7 +1,7 @@
-import { getGeminiClient } from "./gemini-client";
 import { parseGeometryReview, type GeometryReviewProvider } from "./geometry-reviewer";
+import { callRouter } from "./router-client";
 
-export const GEOMETRY_REVIEW_MODEL = process.env.GEMINI_REVIEW_MODEL || "gemini-2.5-flash";
+export const GEOMETRY_REVIEW_MODEL = process.env.AI_REVIEW_MODEL || "gemini-2.5-flash";
 
 export const GEOMETRY_REVIEW_SCHEMA = {
   type: "object",
@@ -44,42 +44,45 @@ export function buildGeometryReviewPrompt(mustKeep: string[], referenceCount = 0
   ].join("\n");
 }
 
-export function buildGeometryReviewParts(request: Parameters<GeometryReviewProvider["review"]>[0]) {
+export function buildRouterReviewImages(request: Parameters<GeometryReviewProvider["review"]>[0]) {
   const references = request.referenceImages ?? [];
   return [
-    { text: buildGeometryReviewPrompt(request.constraints.mustKeep, references.length) },
-    { text: "IMAGE 1 — ORIGINAL PRIMARY VIEW" },
-    { inlineData: { mimeType: request.primaryImage.mimeType, data: request.primaryImage.data.toString("base64") } },
-    { text: "IMAGE 2 — GENERATED REDESIGN TO REVIEW" },
-    { inlineData: { mimeType: request.generatedImage.mimeType, data: request.generatedImage.data.toString("base64") } },
-    ...references.flatMap((image, index) => [
-      { text: `IMAGE ${index + 3} — ORIGINAL REFERENCE VIEW (${image.role})` },
-      { inlineData: { mimeType: image.mimeType, data: image.data.toString("base64") } },
-    ]),
+    {
+      mimeType: request.primaryImage.mimeType,
+      data: request.primaryImage.data.toString("base64"),
+      label: "IMAGE 1 — ORIGINAL PRIMARY VIEW",
+    },
+    {
+      mimeType: request.generatedImage.mimeType,
+      data: request.generatedImage.data.toString("base64"),
+      label: "IMAGE 2 — GENERATED REDESIGN TO REVIEW",
+    },
+    ...references.map((image, index) => ({
+      mimeType: image.mimeType,
+      data: image.data.toString("base64"),
+      label: `IMAGE ${index + 3} — ORIGINAL REFERENCE VIEW (${image.role})`,
+    })),
   ];
 }
 
-export const geminiGeometryReviewer: GeometryReviewProvider = {
+export const routerGeometryReviewer: GeometryReviewProvider = {
   async review(request, signal) {
-    const ai = getGeminiClient();
-    const response = await ai.models.generateContent({
-      model: GEOMETRY_REVIEW_MODEL,
-      contents: [{
-        role: "user",
-        parts: buildGeometryReviewParts(request),
-      }],
-      config: {
-        responseMimeType: "application/json",
-        responseJsonSchema: GEOMETRY_REVIEW_SCHEMA,
+    const referenceImages = request.referenceImages ?? [];
+    const response = await callRouter<{ content: string }>(
+      "/api/structured",
+      {
+        model: GEOMETRY_REVIEW_MODEL,
+        prompt: buildGeometryReviewPrompt(request.constraints.mustKeep, referenceImages.length),
+        images: buildRouterReviewImages(request),
+        jsonSchema: GEOMETRY_REVIEW_SCHEMA,
         temperature: 0,
-        abortSignal: signal,
-        httpOptions: { timeout: 45_000 },
       },
-    });
-    if (!response.text) throw new Error("empty-review-response");
+      signal,
+    );
+    if (!response.content) throw new Error("empty-review-response");
     return {
-      ...parseGeometryReview(response.text),
-      reviewedSourceViews: 1 + (request.referenceImages?.length ?? 0),
+      ...parseGeometryReview(response.content),
+      reviewedSourceViews: 1 + referenceImages.length,
     };
   },
 };

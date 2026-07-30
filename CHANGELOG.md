@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Migrated every Architect image-generation and geometry-review provider call
+  to OLNOO AI Router; removed `@google/genai` and all direct Gemini client code.
+- Added `AI_ROUTER_URL`, `AI_ROUTER_API_KEY`, `AI_IMAGE_MODEL`, and
+  `AI_REVIEW_MODEL` deployment configuration and operational guidance.
+
 Все значимые изменения в проекте Architect OLNOO документируются в этом файле.
 
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),

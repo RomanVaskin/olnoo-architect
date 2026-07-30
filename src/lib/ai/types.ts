@@ -35,7 +35,7 @@ export interface GenerationResult {
 
 /** Identifies a concrete provider + model. Never exposed to the client. */
 export interface ModelSpec {
-  provider: "gemini";
+  provider: "router";
   model: string;
 }
 

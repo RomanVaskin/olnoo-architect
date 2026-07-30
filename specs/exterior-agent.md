@@ -38,10 +38,13 @@ Multipart FormData:
 |---|---|---|
 | Auto | Gemini | сейчас совпадает с Balanced |
 | Fast | Gemini | `gemini-3.1-flash-lite-image` |
-| Balanced | Gemini | `gemini-3.1-flash-image` (`GEMINI_IMAGE_MODEL`) |
+| Balanced | OLNOO AI Router | `gemini-3.1-flash-image` (`AI_IMAGE_MODEL`) |
 | Maximum Quality | Gemini | `gemini-3-pro-image` |
 
-Адаптер провайдера — `src/lib/ai/gemini-provider.ts` (`@google/genai`). Добавление OpenAI или FLUX означает добавление ещё одного адаптера и записи в реестре, без изменений в API-контракте, мастере или Concepts UI.
+Транспортный адаптер — `src/lib/ai/router-provider.ts`. Architect не содержит
+provider SDK и не вызывает Gemini напрямую; запрос идёт через OLNOO AI Router.
+Добавление OpenAI или FLUX выполняется в Router без изменений API-контракта,
+мастера или Concepts UI.
 
 ### Промпт
 
@@ -75,7 +78,11 @@ Multipart FormData:
 
 `src/lib/ai/errors.ts` определяет коды с понятными русскоязычными сообщениями: `missing-api-key`, `unsupported-file`, `provider-timeout`, `safety-rejection`, `rate-limit`, `quota-exhausted`, `malformed-response`, `provider-failure`, `validation`. Конкурентность вызовов провайдера ограничена процессом (`src/lib/ai/concurrency.ts`).
 
-`rate-limit` и `quota-exhausted` оба приходят от Gemini как HTTP 429, но означают разное для пользователя: `rate-limit` — временный всплеск нагрузки, стоит подождать и повторить; `quota-exhausted` — квота проекта на эту модель исчерпана или не активирована (например, free tier с лимитом 0), и повторная попытка не поможет без изменения биллинга/квот. `src/lib/ai/gemini-provider.ts` различает их по содержимому ответа провайдера (`isQuotaExhaustedMessage`) — раздельно от кода, который уходит клиенту; сырой текст ответа провайдера никогда не логируется и не возвращается в браузер.
+`rate-limit` и `quota-exhausted` приходят от OLNOO AI Router как разные
+безопасные коды, хотя оба используют HTTP 429. `rate-limit` означает временный
+всплеск нагрузки; `quota-exhausted` — недоступную квоту модели. Router
+классифицирует сырой provider-ответ и никогда не передаёт его Architect или
+браузеру.
 
 ### Исправленная версия (Phase 6)
 

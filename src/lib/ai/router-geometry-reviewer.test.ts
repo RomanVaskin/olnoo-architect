@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildGeometryReviewParts, buildGeometryReviewPrompt } from "./gemini-geometry-reviewer";
+import { buildGeometryReviewPrompt, buildRouterReviewImages } from "./router-geometry-reviewer";
 import type { GeometryReviewRequest } from "./geometry-reviewer";
 
 function requestWithReferences(): GeometryReviewRequest {
@@ -16,17 +16,15 @@ function requestWithReferences(): GeometryReviewRequest {
 }
 
 test("review payload keeps Primary and generated images first, then appends reference-only source views", () => {
-  const parts = buildGeometryReviewParts(requestWithReferences());
-  const labels = parts.filter((part): part is { text: string } => "text" in part).map((part) => part.text);
-  const images = parts.filter((part): part is { inlineData: { mimeType: string; data: string } } => "inlineData" in part);
+  const images = buildRouterReviewImages(requestWithReferences());
 
   assert.equal(images.length, 4);
-  assert.equal(Buffer.from(images[0].inlineData.data, "base64").toString(), "primary");
-  assert.equal(Buffer.from(images[1].inlineData.data, "base64").toString(), "generated");
-  assert.equal(Buffer.from(images[2].inlineData.data, "base64").toString(), "side");
-  assert.equal(Buffer.from(images[3].inlineData.data, "base64").toString(), "rear");
-  assert.ok(labels.some((label) => label.includes("IMAGE 3 — ORIGINAL REFERENCE VIEW (side)")));
-  assert.ok(labels.some((label) => label.includes("IMAGE 4 — ORIGINAL REFERENCE VIEW (rear)")));
+  assert.equal(Buffer.from(images[0].data, "base64").toString(), "primary");
+  assert.equal(Buffer.from(images[1].data, "base64").toString(), "generated");
+  assert.equal(Buffer.from(images[2].data, "base64").toString(), "side");
+  assert.equal(Buffer.from(images[3].data, "base64").toString(), "rear");
+  assert.match(images[2].label, /IMAGE 3 — ORIGINAL REFERENCE VIEW \(side\)/);
+  assert.match(images[3].label, /IMAGE 4 — ORIGINAL REFERENCE VIEW \(rear\)/);
 });
 
 test("review prompt treats reference views as identity context, not output-camera targets", () => {

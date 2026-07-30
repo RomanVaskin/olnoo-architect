@@ -20,14 +20,32 @@ Set these in the hosting platform's project settings (never commit real values �
 
 | Variable | Scope | Notes |
 |---|---|---|
-| `GEMINI_API_KEY` | Server-only | Never prefixed `NEXT_PUBLIC_`; confirmed absent from the built client bundle. |
-| `GEMINI_IMAGE_MODEL` | Server-only, optional | Falls back to `gemini-3.1-flash-image` if unset. |
-| `GEMINI_REVIEW_MODEL` | Server-only, optional | Falls back to `gemini-2.5-flash` if unset. |
+| `AI_ROUTER_URL` | Server-only | Internal base URL of OLNOO AI Router, for example `http://127.0.0.1:8080`. |
+| `AI_ROUTER_API_KEY` | Server-only | Architect service credential accepted by Router `API_KEYS`; never expose to the browser. |
+| `AI_IMAGE_MODEL` | Server-only, optional | Falls back to `gemini-3.1-flash-image`; the model must be enabled in Router. |
+| `AI_REVIEW_MODEL` | Server-only, optional | Falls back to `gemini-2.5-flash`; the model must be enabled in Router. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Public | Safe to expose — scoped by RLS. |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public | The publishable key, never a service-role key. |
 | `NEXT_PUBLIC_SITE_URL` | Public | Set to the real production origin, no trailing slash — used as the Supabase email-confirmation redirect base. |
 
 No `SUPABASE_SERVICE_ROLE_KEY` or equivalent exists anywhere in application code — confirmed by repo-wide grep. Every server route uses the caller's own RLS session client only.
+
+`GEMINI_API_KEY` must not be configured in Architect. It belongs only to OLNOO
+AI Router. Verify the dependency before starting Architect:
+
+```bash
+curl --fail "$AI_ROUTER_URL/health"
+```
+
+Troubleshooting:
+
+- Router `401`: `AI_ROUTER_API_KEY` does not match Router `API_KEYS`.
+- Router `404 MODEL_NOT_FOUND`: selected model is absent from Router
+  `GEMINI_MODELS`.
+- Router `504`: provider exceeded Router timeout; Architect keeps the paid
+  attempt recoverable and requires acknowledgement when outcome is ambiguous.
+- Router `429`: wait for a transient limit or correct provider quota/billing.
+- Connection failure: inspect Router health/logs before retrying a paid attempt.
 
 ## 2. Supabase production settings (manual — not changed by this task)
 

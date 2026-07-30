@@ -1,4 +1,4 @@
-import { geminiGeometryReviewer } from "./gemini-geometry-reviewer";
+import { routerGeometryReviewer } from "./router-geometry-reviewer";
 import type { GeometryReviewProvider } from "./geometry-reviewer";
 
 /**
@@ -6,5 +6,5 @@ import type { GeometryReviewProvider } from "./geometry-reviewer";
  * without changing the API route, persistence or UI report contract.
  */
 export function getGeometryReviewer(): GeometryReviewProvider {
-  return geminiGeometryReviewer;
+  return routerGeometryReviewer;
 }
