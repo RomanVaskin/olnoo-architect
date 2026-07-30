@@ -29,9 +29,7 @@
     "typescript": "^5"
   },
   "overrides": {
-    "eslint-config-next": {
-      "minimatch": "10.2.6"
-    },
+    "minimatch": "10.2.6",
     "postcss": "8.5.25",
     "sharp": "$sharp"
   }
