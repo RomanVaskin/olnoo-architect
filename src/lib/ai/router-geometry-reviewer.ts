@@ -1,7 +1,7 @@
 import { parseGeometryReview, type GeometryReviewProvider } from "./geometry-reviewer";
 import { callRouter } from "./router-client";
 
-export const GEOMETRY_REVIEW_MODEL = process.env.AI_REVIEW_MODEL || "gemini-2.5-flash";
+export const GEOMETRY_REVIEW_MODEL = process.env.AI_REVIEW_MODEL || "gemini-3.5-flash";
 
 export const GEOMETRY_REVIEW_SCHEMA = {
   type: "object",

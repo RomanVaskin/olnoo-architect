@@ -23,7 +23,7 @@ Set these in the hosting platform's project settings (never commit real values �
 | `AI_ROUTER_URL` | Server-only | Internal base URL of OLNOO AI Router, for example `http://127.0.0.1:8080`. |
 | `AI_ROUTER_API_KEY` | Server-only | Architect service credential accepted by Router `API_KEYS`; never expose to the browser. |
 | `AI_IMAGE_MODEL` | Server-only, optional | Falls back to `gemini-3.1-flash-image`; the model must be enabled in Router. |
-| `AI_REVIEW_MODEL` | Server-only, optional | Falls back to `gemini-2.5-flash`; the model must be enabled in Router. |
+| `AI_REVIEW_MODEL` | Server-only, optional | Falls back to `gemini-3.5-flash`; the model must be enabled in Router. |
 | `NEXT_PUBLIC_SUPABASE_URL` | Public | Safe to expose — scoped by RLS. |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public | The publishable key, never a service-role key. |
 | `NEXT_PUBLIC_SITE_URL` | Public | Set to the real production origin, no trailing slash — used as the Supabase email-confirmation redirect base. |

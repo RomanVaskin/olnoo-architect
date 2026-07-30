@@ -18,7 +18,7 @@
 подтверждённый Primary View и готовую концепцию, используя до двух
 дополнительных исходных ракурсов как контекст того же здания. Все изображения
 анализируются одним schema-constrained запросом к OLNOO AI Router. В MVP
-используется `gemini-2.5-flash` (`AI_REVIEW_MODEL`), но Architect не вызывает
+используется `gemini-3.5-flash` (`AI_REVIEW_MODEL`), но Architect не вызывает
 Gemini напрямую. Провайдер скрыт за `GeometryReviewProvider`,
 `getGeometryReviewer` и Router.
 
